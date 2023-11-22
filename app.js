@@ -6,9 +6,12 @@ var logger = require('morgan');
 var methodOverride=require('method-override');
 var handlebars=require('express-handlebars');
 
+var sequelize = require('./configs/db/index');
 var route = require('./routes/index');
 
 var app = express();
+
+sequelize.sync()
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
