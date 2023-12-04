@@ -7,11 +7,12 @@ var methodOverride=require('method-override');
 var handlebars=require('express-handlebars');
 
 var sequelize = require('./configs/db/index');
-var route = require('./routes/index');
+var { Admin, MS, Supervisor, Camera, Fire, Email_sended, Credential } = require('./models/index');
+sequelize.sync()
 
 var app = express();
 
-sequelize.sync()
+var route = require('./routes/index');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
