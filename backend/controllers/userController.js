@@ -89,6 +89,11 @@ class UserController {
     // [GET] /user/show
     async show(req, res, next) {
         const users = await Supervisor.findAll();
+        if (!users[0]) {
+            return res.status(404).json({
+                message: 'User is not found'
+            });
+        };
         return res.json(users);
     };
 
@@ -99,6 +104,11 @@ class UserController {
                 userId: req.params.id
             }
         });
+        if (!user) {
+            return res.status(404).json({
+                message: 'User is not found'
+            });
+        };
         return res.json(user);
     };
 
@@ -121,12 +131,12 @@ class UserController {
         }
     };
 
-    // [DELETE] /user/delete/:id
+    // [DELETE] /user/delete/:email
     async delete(req, res, next) {
         try {
-            await Supervisor.destroy({
+            await Credential.destroy({
                 where: {
-                    userId: req.params.id
+                    email: req.params.email
                 }
             })
         }

@@ -82,11 +82,16 @@ class CameraController {
     // [PUT] /camera/update-info/:id
     async updateInfo(req, res, next) {
         try {
-            await Camera.update(req.body, {
+            const updated = await Camera.update(req.body, {
                 where: {
                     cameraId: req.params.id
                 }
             });
+            if (!updated[0]) {
+                return res.status(404).json({
+                    message: 'Camera is not found'
+                });
+            };
             return res.status(200).json({
                 message: 'Update successfully'
             });
@@ -101,11 +106,16 @@ class CameraController {
     // [PUT] /camera/update-status/:id
     async updateStatus(req, res, next) {
         try {
-            await Camera.update(req.body.status, {
+            const updated = await Camera.update(req.body.status, {
                 where: {
                     cameraId: req.params.id
                 }
             });
+            if (!updated[0]) {
+                return res.status(404).json({
+                    message: 'Camera is not found'
+                });
+            };
             return res.status(200).json({
                 message: 'Update successfully'
             });
