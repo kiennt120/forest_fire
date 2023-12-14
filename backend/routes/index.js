@@ -4,13 +4,17 @@ var mSRouter = require('./mS');
 var authRouter = require('./auth');
 var cameraRouter = require('./camera');
 var authController = require('../controllers/authController');
+const express = require('express');
+const cors = require('cors');
 
 function route(app) {
-  app.use('/user', authController.protect, authController.restrict('admin'), userRouter);
-  app.use('/auth', authRouter);
-  app.use('/monitoring-station', authController.protect, authController.restrict('admin'), mSRouter)
-  app.use('/camera', authController.protect, authController.restrict('admin'), cameraRouter);
-  // app.use('/', fireListRouter);
+    app.use(express.json());
+    app.use(cors());
+    app.use('/api/user', authController.protect, authController.restrict('admin'), userRouter);
+    app.use('/api/auth', authRouter);
+    app.use('/api/monitoring-station', authController.protect, authController.restrict('admin'), mSRouter);
+    app.use('/api/camera', authController.protect, authController.restrict('admin'), cameraRouter);
+    // app.use('/', fireListRouter);
 }
 
 module.exports = route;

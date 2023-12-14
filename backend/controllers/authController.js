@@ -6,71 +6,82 @@ const { registerValidator } = require('../validations/auth');
 // Create token
 const signToken = (email, role) => {
     return jwt.sign({ email, role }, process.env.JWT_SECRET, {
-        expiresIn: process.env.expiresIn
+        expiresIn: process.env.expiresIn,
     });
-}
+};
 
 class AuthController {
-
     // [POST] /auth/login
     async login(req, res, next) {
-
         // Check validation of email and password
-        const { error } = registerValidator({email: req.body.email, password: req.body.password});
-        if (error) return res.status(422).send(error.details[0].message);
-
-        const user = await Credential.findOne({ // find user
-            where: {
-                email: req.body.email
-            }
+        const { error } = registerValidator({
+            email: req.body.email,
+            password: req.body.password,
         });
-        if (!user) { // user not found
+        if (error)
+            return res.status(422).send({
+                status: false,
+                message: error.details[0].message,
+            });
+
+        const user = await Credential.findOne({
+            // find user
+            where: {
+                email: req.body.email,
+            },
+        });
+        if (!user) {
+            // user not found
             return res.status(422).json({
-                message: 'email or password is incorrect'
+                status: false,
+                message: 'email or password is incorrect',
             });
         }
         const checkPassword = await bcrypt.compare(req.body.password, user.password); // compare password
-        if (!checkPassword) { // password incorrect
+        if (!checkPassword) {
+            // password incorrect
             return res.status(422).json({
-                message: 'email or password is incorrect'
+                status: false,
+                message: 'email or password is incorrect',
             });
         }
         const token = signToken(user.email, user.role);
+        res.header('Authorization', token);
         res.status(201).json({
-            status: 'success',
+            status: true,
             token: token,
-            data: {
-                user: user,
-            }
+            user: user,
         });
     }
 
     // [POST] /auth/logout
-    async logout(req, res, next) {
-        
-    }
+    async logout(req, res, next) {}
 
     // [PATCH] /auth/update-password
     async updatePassword(req, res, next) {
-
         // Check validation of email and password
-        const { error } = registerValidator({email: req.body.email, password: req.body.new_password});
-        if (error) return res.status(422).send(error.details[0].message);
-        const account = await Credential.findOne({ // find user
-            where: {
-                email: req.body.email
-            }
+        const { error } = registerValidator({
+            email: req.body.email,
+            password: req.body.new_password,
         });
-        if (!account) { // user not found
+        if (error) return res.status(422).send(error.details[0].message);
+        const account = await Credential.findOne({
+            // find user
+            where: {
+                email: req.body.email,
+            },
+        });
+        if (!account) {
+            // user not found
             return res.status(422).json({
-                message: 'User not found'
+                message: 'User not found',
             });
-        };
+        }
 
         const checkPassword = await bcrypt.compare(req.body.new_password, account.password); // compare password
         if (checkPassword) {
             return res.status(422).json({
-                message: 'Password is not changed'
+                message: 'Password is not changed',
             });
         }
         const salt = await bcrypt.genSalt(10);
@@ -79,22 +90,20 @@ class AuthController {
             password: hashedPassword,
         };
         try {
-            const user = await Credential.update(obj, { // update password
+            const user = await Credential.update(obj, {
+                // update password
                 where: {
-                    email: req.body.email
-                }
+                    email: req.body.email,
+                },
             });
             console.log(user);
             const token = signToken(user.email, user.role);
             res.status(201).json({
                 status: 'success',
                 token,
-                data: {
-                    user: user,
-                }
+                user: user,
             });
-        }
-        catch (err) {
+        } catch (err) {
             return res.status(400).send(err);
         }
     }
@@ -108,7 +117,7 @@ class AuthController {
         }
         if (!token) {
             return res.status(401).json({
-                message: 'You are not logged in! Please log in to get access.'
+                message: 'You are not logged in! Please log in to get access.',
             });
         }
 
@@ -116,26 +125,24 @@ class AuthController {
         let decoded;
         try {
             decoded = jwt.verify(token, process.env.JWT_SECRET);
-        }
-        catch (err) {
+        } catch (err) {
             return res.status(401).json({
-                message: err.message
-            })
-        };
+                message: err.message,
+            });
+        }
         // 3. If user is exits
         let user;
         if (decoded.role !== 'admin') {
             user = await Supervisor.findOne({
                 where: {
-                    email: decoded.email
-                }
+                    email: decoded.email,
+                },
             });
-        }
-        else {
+        } else {
             user = await Admin.findOne({
                 where: {
-                    email: decoded.email
-                }
+                    email: decoded.email,
+                },
             });
         }
 
@@ -151,22 +158,18 @@ class AuthController {
         return (req, res, next) => {
             if (req.user.role !== role) {
                 return res.status(403).json({
-                    message: 'You do not have permission to perform this action'
+                    message: 'You do not have permission to perform this action',
                 });
             }
             next();
-        }
+        };
     }
 
     // [POST] /auth/forgot-password
-    forgotPassword(req, res, next) {
-
-    }
+    forgotPassword(req, res, next) {}
 
     // [POST] /auth/reset-password
-    resetPassword(req, res, next) {
-
-    }
+    resetPassword(req, res, next) {}
 }
 
-module.exports = new AuthController;
+module.exports = new AuthController();
