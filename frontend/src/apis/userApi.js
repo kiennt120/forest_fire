@@ -8,6 +8,7 @@ const userApi = {
             if (res.status) {
                 localStorage.setItem('token', res.token);
                 localStorage.setItem('user', JSON.stringify(res.user));
+                localStorage.setItem('role', res.role);
             }
             return res;
         });
@@ -27,13 +28,9 @@ const userApi = {
             return res;
         });
     },
-    show(data) {
+    show() {
         const url = '/user/show';
-        if (!data.page || !data.limit) {
-            data.limit = 10;
-            data.page = 1;
-        }
-        return axiosClient.post(url, data);
+        return axiosClient.get(url);
     },
     showOne(email) {
         const url = `/user/show/${email}`;

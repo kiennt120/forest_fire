@@ -17,18 +17,22 @@ const Login = () => {
             .then(function (response) {
                 if (!response.status) {
                     setLogin(false);
+                    if (response.status === false) {
+                        notification['error']({
+                            message: 'Đăng nhập thất bại',
+                            description: response.message,
+                        });
+                    }
                 } else {
                     (async () => {
                         try {
-                            console.log(response);
-                            // if (response.user.status !== 'noactive') {
-                            //     navigate('/dash-board');
-                            // } else {
-                            //     notification['error']({
-                            //         message: `Thông báo`,
-                            //         description: 'Bạn không có quyền truy cập vào hệ thống',
-                            //     });
-                            // }
+                            if (localStorage.getItem('role') === 'admin') {
+                                navigate('/monitoring-station');
+                            } else if (localStorage.getItem('role') === 'user') {
+                                navigate('/fire-list');
+                            }
+                            // console.log(response);
+                            // setLogin(true);
                         } catch (error) {
                             console.log('Failed to fetch ping role:' + error);
                         }
@@ -65,7 +69,7 @@ const Login = () => {
                         <Form.Item style={{ marginBottom: 16, textAlign: 'center' }}>
                             <p className="text">Đăng nhập để vào hệ thống quản lý</p>
                         </Form.Item>
-                        <>
+                        {/* <>
                             {isLogin === false ? (
                                 <Form.Item style={{ marginBottom: 16 }}>
                                     <Alert message="Email hoặc mật khẩu sai" type="error" showIcon />
@@ -73,7 +77,7 @@ const Login = () => {
                             ) : (
                                 ''
                             )}
-                        </>
+                        </> */}
                         <Form.Item
                             style={{ marginBottom: 20 }}
                             name="email"

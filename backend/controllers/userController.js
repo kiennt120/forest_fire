@@ -82,12 +82,7 @@ class UserController {
 
     // [POST] /user/show
     async show(req, res, next) {
-        const page = req.body.page || 1;
-        const limit = req.body.limit || 10;
-        const users = await Supervisor.findAll({
-            limit: limit,
-            offset: (page - 1) * limit,
-        });
+        const users = await Supervisor.findAll();
         if (!users[0]) {
             return res.status(404).json({
                 message: 'User is not found',
@@ -98,15 +93,22 @@ class UserController {
 
     // [GET] /user/show/:email
     async showOne(req, res, next) {
-        const user = await Supervisor.findOne({
+        let user = await Supervisor.findOne({
             where: {
                 email: req.params.email,
             },
         });
         if (!user) {
-            return res.status(404).json({
-                message: 'User is not found',
+            user = await Admin.findOne({
+                where: {
+                    email: req.params.email,
+                },
             });
+            if (!user) {
+                return res.status(404).json({
+                    message: 'User is not found',
+                });
+            }
         }
         return res.json(user);
     }
@@ -144,9 +146,6 @@ class UserController {
 
     // [GET] /user/search?q=
     async search(req, res, next) {
-        // const page = req.body.page || 1;
-        // const limit = req.body.limit || 10;
-
         const users = await Supervisor.findAll({
             where: {
                 [op.or]: [
@@ -156,8 +155,6 @@ class UserController {
                     { phone: { [op.like]: `%${req.query.q}%` } },
                 ],
             },
-            // limit: limit,
-            // offset: (page - 1) * limit,
         });
         return res.json(users);
     }

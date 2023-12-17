@@ -6,6 +6,7 @@ import { TranslationOutlined, BellFilled, NotificationTwoTone } from '@ant-desig
 import userApi from '~/apis/userApi';
 import en from '~/assets/image/en.png';
 import vn from '~/assets/image/vn.png';
+import logo from '~/assets/image/a.png';
 
 const { Header } = Layout;
 
@@ -94,7 +95,7 @@ function Topbar() {
     );
     const TransalteSwitch = () => {
         return (
-            <Dropdown key="more" overlay={menu} placement="bottomCenter" arrow>
+            <Dropdown key="more" menu={menu} placement="bottomCenter" arrow>
                 <div
                     style={{
                         paddingLeft: 10,
@@ -112,8 +113,8 @@ function Topbar() {
     useEffect(() => {
         (async () => {
             try {
-                const res = await userApi.pingRole();
-                console.log(res.role);
+                // const res = await userApi.pingRole();
+                // console.log(res.role);
             } catch (error) {
                 console.log('Failed to fetch event list:' + error);
             }
@@ -130,6 +131,7 @@ function Topbar() {
                         top: 0,
                         position: 'fixed',
                         left: 0,
+                        height: 64,
                         display: 'flex',
                         width: '100%',
                         padding: 0,
@@ -150,9 +152,9 @@ function Topbar() {
                             }}
                         >
                             <Row justify="center">
-                                <Col style={{ paddingLeft: 20 }}>
-                                    <a href="#">
-                                        <img style={{ height: 44 }} className="logo" alt="" src="" />
+                                <Col style={{ paddingLeft: 40 }}>
+                                    <a href="/fire-list">
+                                        <img style={{ height: 40, width: 100 }} className="logo" alt="" src={logo} />
                                     </a>
                                 </Col>
                             </Row>
@@ -178,7 +180,7 @@ function Topbar() {
                 </Row>
                 <Modal
                     title={titleNotification}
-                    visible={visible}
+                    open={visible}
                     onOk={handleOk}
                     onCancel={handleOk}
                     cancelButtonProps={{ style: { display: 'none' } }}

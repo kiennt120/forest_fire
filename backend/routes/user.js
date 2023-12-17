@@ -3,7 +3,7 @@ var router = express.Router();
 var userController = require('../controllers/userController');
 
 router.post('/create', userController.createAccount);
-router.post('/show', userController.show);
+router.get('/show', userController.show);
 router.get('/show/:email', userController.showOne);
 router.get('/search', userController.search);
 router.put('/update/:id', userController.update);

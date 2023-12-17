@@ -1,6 +1,6 @@
 var userRouter = require('./user');
 var mSRouter = require('./mS');
-// var fireListRouter = require('./fireList');
+var fireListRouter = require('./fireList');
 var authRouter = require('./auth');
 var cameraRouter = require('./camera');
 var authController = require('../controllers/authController');
@@ -14,7 +14,7 @@ function route(app) {
     app.use('/api/auth', authRouter);
     app.use('/api/monitoring-station', authController.protect, authController.restrict('admin'), mSRouter);
     app.use('/api/camera', authController.protect, authController.restrict('admin'), cameraRouter);
-    // app.use('/', fireListRouter);
+    app.use('/api/fire-list', fireListRouter);
 }
 
 module.exports = route;

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Avatar, Dropdown, Row, Menu } from 'antd';
 import { UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
 import userApi from '~/apis/userApi';
+import avatar from '~/assets/image/FB_IMG_1613925132995.jpg';
 
 function DropDownMenu() {
     const [userData, setUserData] = useState([]);
@@ -11,14 +12,14 @@ function DropDownMenu() {
 
     const Logout = async () => {
         localStorage.clear();
-        navigate.push('/login');
+        navigate('/login');
     };
 
     useEffect(() => {
         (async () => {
             try {
-                const res = await userApi.showOne(localStorage.getItem('user').email);
-                console.log(res);
+                const res = await userApi.showOne(JSON.parse(localStorage.getItem('user')).email);
+                // console.log(res);
                 setUserData(res.user);
             } catch (error) {
                 console.log('Failed to fetch profile user:' + error);
@@ -27,17 +28,17 @@ function DropDownMenu() {
     }, []);
 
     const handleRouter = (link) => {
-        navigate.push(link);
+        navigate(link);
     };
 
-    const avatar = (
+    const menu = (
         <Menu>
-            <Menu.Item icon={<UserOutlined />}>
+            <Menu.Item key="1" icon={<UserOutlined />}>
                 <a target="_blank" rel="noopener noreferrer" onClick={() => handleRouter('/profile')}>
                     Thông tin cá nhân
                 </a>
             </Menu.Item>
-            <Menu.Item icon={<SettingOutlined />} onClick={() => handleRouter('/update-password')}>
+            <Menu.Item key="2" icon={<SettingOutlined />} onClick={() => handleRouter('/update-password')}>
                 <a target="_blank" rel="noopener noreferrer">
                     Thay đổi mật khẩu
                 </a>
@@ -51,7 +52,7 @@ function DropDownMenu() {
     );
 
     return (
-        <Dropdown key="avatar" placement="bottomCenter" overlay={avatar} arrow>
+        <Dropdown key="avatar" placement="bottom" overlay={menu} arrow>
             <Row
                 style={{
                     paddingLeft: 5,
@@ -66,7 +67,7 @@ function DropDownMenu() {
                             style={{
                                 outline: 'none',
                             }}
-                            src={userData?.image}
+                            src={avatar}
                         />
                     </div>
                     <p style={{ padding: 0, margin: 0, textTransform: 'capitalize', color: '#000000' }}>
