@@ -19,8 +19,10 @@ import {
 } from 'antd';
 import axios from 'axios';
 import mSApi from '~/apis/mSApi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PageHeader } from '@ant-design/pro-layout';
+
+const { Option } = Select;
 
 const MonitoringStation = () => {
     const pageSize = 10;
@@ -65,13 +67,14 @@ const MonitoringStation = () => {
             };
             await mSApi.createMonitoringStation(newMS).then((res) => {
                 if (res.status) {
+                    // form.resetFields();
                     notification['success']({
                         message: 'Thông báo',
                         description: res.description,
                     });
+
                     setOpenModalCreate(false);
                     handleMSList({ page, limit: pageSize });
-                    // form.resetFields();
                 } else {
                     notification['error']({
                         message: 'Thông báo',
@@ -103,9 +106,9 @@ const MonitoringStation = () => {
                         message: 'Thông báo',
                         description: res.description,
                     });
-                    setOpenModalUpdate(false);
+                    form2.resetFields();
                     handleMSList({ page, limit: pageSize });
-                    // form.resetFields();
+                    setOpenModalUpdate(false);
                 } else {
                     notification['error']({
                         message: 'Thông báo',
@@ -153,6 +156,8 @@ const MonitoringStation = () => {
         }
     };
 
+    const navigate = useNavigate();
+
     const handleMSList = async (data) => {
         try {
             await mSApi.getMonitoringStation(data).then((res) => {
@@ -180,6 +185,9 @@ const MonitoringStation = () => {
                     area: res.ms.area,
                     phone: res.ms.phone,
                 });
+                setSelectedCity(res.ms.city);
+                setSelectedDistrict(res.ms.district);
+                setSelectedWard(res.ms.ward);
                 console.log(form2);
                 setLoading(false);
             } catch (error) {
@@ -295,8 +303,16 @@ const MonitoringStation = () => {
         (async () => {
             try {
                 await mSApi.getMonitoringStation().then((res) => {
-                    setMSList(res.ms);
-                    setLoading(false);
+                    if (res.status) {
+                        console.log(res);
+                        setMSList(res.ms);
+                        setLoading(false);
+                    } else {
+                        if (res.code === 401 || res.code === 403) {
+                            localStorage.clear();
+                            navigate('/login');
+                        }
+                    }
                 });
                 var promise = axios(Parameter);
                 promise.then((res) => {
@@ -453,7 +469,7 @@ const MonitoringStation = () => {
                             /> */}
                             <select
                                 placeholder="Chọn tỉnh/thành phố"
-                                value={selectedCity}
+                                // value={selectedCity}
                                 onChange={(e) => setSelectedCity(e.target.value)}
                             >
                                 <option>Choose city</option>
@@ -480,7 +496,7 @@ const MonitoringStation = () => {
                             /> */}
                             <select
                                 placeholder="Chọn quận/huyện"
-                                value={selectedDistrict}
+                                // value={selectedDistrict}
                                 onChange={(e) => setSelectedDistrict(e.target.value)}
                             >
                                 <option>Choose district</option>
@@ -500,10 +516,10 @@ const MonitoringStation = () => {
                         >
                             <select
                                 placeholder="Chọn phường/xã/thị trấn"
-                                value={selectedWard}
+                                // value={selectedWard}
                                 onChange={(e) => setSelectedWard(e.target.value)}
                             >
-                                <option>Choose district</option>
+                                <option>Choose ward</option>
                                 {availableWard?.wards.map((e, key) => {
                                     return (
                                         <option value={e.name} key={key}>
@@ -571,7 +587,7 @@ const MonitoringStation = () => {
                 >
                     <Form
                         form={form2}
-                        name="eventCreate"
+                        name="eventUpdate"
                         layout="vertical"
                         initialValues={{ residence: ['zhejiang', 'hangzhou', 'xihu'], prefix: '86' }}
                         scrollToFirstError
@@ -619,6 +635,11 @@ const MonitoringStation = () => {
                                 }}
                                 options={data.map((c) => ({ value: c.name, label: c.name }))}
                             /> */}
+                            {/* <Select showSearch placeholder="Tỉnh/Thành phố" onChange={(e) => setSelectedCity(e)}>
+                                {data.map((c, key) => (
+                                    <Option key={key} value={c.name} />
+                                ))}
+                            </Select> */}
                             <select
                                 placeholder="Chọn tỉnh/thành phố"
                                 value={selectedCity}
@@ -646,6 +667,11 @@ const MonitoringStation = () => {
                                 onChange={(e) => setSelectedDistrict}
                                 options={availableDistrict?.districts.map((e) => ({ value: e.name, label: e.name }))}
                             /> */}
+                            {/* <Select showSearch placeholder="Quận/Huyện" onChange={(e) => setSelectedDistrict(e)}>
+                                {availableDistrict?.districts.map((c, key) => (
+                                    <Option key={key} value={c.name} />
+                                ))}
+                            </Select> */}
                             <select
                                 placeholder="Chọn quận/huyện"
                                 value={selectedDistrict}
@@ -671,7 +697,7 @@ const MonitoringStation = () => {
                                 value={selectedWard}
                                 onChange={(e) => setSelectedWard(e.target.value)}
                             >
-                                <option>Choose district</option>
+                                <option>Choose ward</option>
                                 {availableWard?.wards.map((e, key) => {
                                     return (
                                         <option value={e.name} key={key}>

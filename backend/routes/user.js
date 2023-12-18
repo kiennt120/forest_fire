@@ -6,7 +6,7 @@ router.post('/create', userController.createAccount);
 router.get('/show', userController.show);
 router.get('/show/:email', userController.showOne);
 router.get('/search', userController.search);
-router.put('/update/:id', userController.update);
+router.put('/update/:email', userController.update);
 router.delete('/delete/:email', userController.delete);
 router.get('/', userController.show);
 

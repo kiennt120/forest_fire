@@ -86,6 +86,10 @@ const Login = () => {
                                     required: true,
                                     message: 'Please input your email!',
                                 },
+                                {
+                                    type: 'email',
+                                    message: 'The input is not valid E-mail!',
+                                },
                             ]}
                         >
                             <Input
@@ -101,6 +105,10 @@ const Login = () => {
                                 {
                                     required: true,
                                     message: 'Please input your Password!',
+                                },
+                                {
+                                    min: 6,
+                                    message: 'Password must be at least 6 characters',
                                 },
                             ]}
                         >

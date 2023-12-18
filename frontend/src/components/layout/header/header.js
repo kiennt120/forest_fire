@@ -7,6 +7,8 @@ import userApi from '~/apis/userApi';
 import en from '~/assets/image/en.png';
 import vn from '~/assets/image/vn.png';
 import logo from '~/assets/image/a.png';
+import avatar from '~/assets/image/FB_IMG_1613925132995.jpg';
+import { Link } from 'react-router-dom';
 
 const { Header } = Layout;
 
@@ -173,7 +175,34 @@ function Topbar() {
                             }}
                         >
                             <Row>
-                                <MenuDropDown key="image" />
+                                {localStorage.getItem('token') !== null ? (
+                                    <MenuDropDown key="image" />
+                                ) : (
+                                    <Row
+                                        style={{
+                                            paddingLeft: 5,
+                                            paddingRight: 5,
+                                            cursor: 'pointer',
+                                        }}
+                                        className="container"
+                                    >
+                                        <div
+                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                        >
+                                            <div style={{ paddingRight: 10 }}>
+                                                <Avatar
+                                                    style={{
+                                                        outline: 'none',
+                                                    }}
+                                                    src={avatar}
+                                                />
+                                            </div>
+                                            {/* <p style={{ padding: 0, margin: 0, textTransform: 'capitalize', color: '#000000' }}> */}
+                                            <Link to="/login">Login</Link>
+                                            {/* </p> */}
+                                        </div>
+                                    </Row>
+                                )}
                             </Row>
                         </div>
                     </Col>

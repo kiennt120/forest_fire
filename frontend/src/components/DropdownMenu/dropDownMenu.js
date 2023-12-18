@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './dropdownMenu.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Avatar, Dropdown, Row, Menu } from 'antd';
 import { UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
 import userApi from '~/apis/userApi';
@@ -16,15 +16,7 @@ function DropDownMenu() {
     };
 
     useEffect(() => {
-        (async () => {
-            try {
-                const res = await userApi.showOne(JSON.parse(localStorage.getItem('user')).email);
-                // console.log(res);
-                setUserData(res.user);
-            } catch (error) {
-                console.log('Failed to fetch profile user:' + error);
-            }
-        })();
+        setUserData(JSON.parse(localStorage.getItem('user')));
     }, []);
 
     const handleRouter = (link) => {
@@ -52,6 +44,7 @@ function DropDownMenu() {
     );
 
     return (
+        // localStorage.getItem('token') !== null ?
         <Dropdown key="avatar" placement="bottom" overlay={menu} arrow>
             <Row
                 style={{
@@ -71,11 +64,34 @@ function DropDownMenu() {
                         />
                     </div>
                     <p style={{ padding: 0, margin: 0, textTransform: 'capitalize', color: '#000000' }}>
-                        {userData?.email}
+                        {userData?.name}
                     </p>
                 </div>
             </Row>
         </Dropdown>
+        // ) : (
+        //     <Row
+        //         style={{
+        //             paddingLeft: 5,
+        //             paddingRight: 5,
+        //             cursor: 'pointer',
+        //         }}
+        //         className="container"
+        //     >
+        //         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        //             <div style={{ paddingRight: 10 }}>
+        //                 <Avatar
+        //                     style={{
+        //                         outline: 'none',
+        //                     }}
+        //                     src={avatar}
+        //                 />
+        //             </div>
+        //             {/* <p style={{ padding: 0, margin: 0, textTransform: 'capitalize', color: '#000000' }}> */}
+        //             <Link to="/login">Login</Link>
+        //             {/* </p> */}
+        //         </div>
+        //     </Row>
     );
 }
 

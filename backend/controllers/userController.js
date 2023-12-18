@@ -22,6 +22,7 @@ class UserController {
             });
             if (!created) {
                 return res.status(422).json({
+                    status: false,
                     message: 'User is already exist',
                 });
             }
@@ -31,6 +32,7 @@ class UserController {
                     email: req.body.email,
                 });
                 return res.status(201).json({
+                    status: true,
                     message: 'Create account successfully',
                 });
             } catch (err) {
@@ -57,6 +59,7 @@ class UserController {
             });
             if (!created) {
                 return res.status(422).json({
+                    status: false,
                     message: 'User is already exist',
                 });
             }
@@ -65,8 +68,11 @@ class UserController {
                     name: req.body.name,
                     mSName: req.body.mSName,
                     email: req.body.email,
+                    phone: req.body.phone,
+                    birthday: req.body.birthday,
                 });
                 return res.status(201).json({
+                    status: true,
                     message: 'Create account successfully',
                 });
             } catch (err) {
@@ -75,20 +81,15 @@ class UserController {
                         email: req.body.email,
                     },
                 });
-                return res.status(400).send(err);
+                return res.status(400).json({ status: false, message: err });
             }
         }
     }
 
-    // [POST] /user/show
+    // [GET] /user/show
     async show(req, res, next) {
-        const users = await Supervisor.findAll();
-        if (!users[0]) {
-            return res.status(404).json({
-                message: 'User is not found',
-            });
-        }
-        return res.status(200).json(users);
+        const user = await Supervisor.findAll();
+        return res.status(200).json({ status: true, user });
     }
 
     // [GET] /user/show/:email
@@ -106,11 +107,12 @@ class UserController {
             });
             if (!user) {
                 return res.status(404).json({
+                    status: false,
                     message: 'User is not found',
                 });
             }
         }
-        return res.json(user);
+        return res.json({ status: true, user });
     }
 
     // [GET] /user/edit/:id
@@ -118,35 +120,38 @@ class UserController {
         res.send('edit user');
     }
 
-    // [PUT] /user/update/:id
+    // [PUT] /user/update/:email
     async update(req, res, next) {
         try {
             await Supervisor.update(req.body, {
                 where: {
-                    userId: req.params.id,
+                    email: req.params.email,
                 },
             });
+            return res.json({ status: true, message: 'Update successfully' });
         } catch (err) {
-            return res.json(err);
+            return res.json({ status: false, message: err });
         }
     }
 
     // [DELETE] /user/delete/:email
     async delete(req, res, next) {
         try {
+            console.log(req.params.email);
             await Credential.destroy({
                 where: {
                     email: req.params.email,
                 },
             });
+            return res.json({ status: true, message: 'Delete successfully' });
         } catch (err) {
-            return res.json(err);
+            return res.json({ status: false, message: err });
         }
     }
 
     // [GET] /user/search?q=
     async search(req, res, next) {
-        const users = await Supervisor.findAll({
+        const user = await Supervisor.findAll({
             where: {
                 [op.or]: [
                     { name: { [op.like]: `%${req.query.q}%` } },
@@ -156,7 +161,7 @@ class UserController {
                 ],
             },
         });
-        return res.json(users);
+        return res.json({ status: true, user });
     }
 }
 

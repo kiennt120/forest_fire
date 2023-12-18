@@ -1,6 +1,10 @@
 import axiosClient from './axiosClient';
 
 const userApi = {
+    register(data) {
+        const url = '/user/create';
+        return axiosClient.post(url, data);
+    },
     login(email, password) {
         const url = '/auth/login';
         return axiosClient.post(url, { email, password }).then((res) => {
@@ -13,20 +17,9 @@ const userApi = {
             return res;
         });
     },
-    // logout() {
-    //     const url = '/auth/logout';
-    //     return axiosClient.get(url);
-    // },
     updatePassword(email, password) {
         const url = '/auth/update-password';
-        return axiosClient.patch(url, { email, password }).then((res) => {
-            console.log(res);
-            if (res.status === 'success') {
-                localStorage.setItem('token', res.token);
-                localStorage.setItem('user', JSON.stringify(res.user));
-            }
-            return res;
-        });
+        return axiosClient.patch(url, { email, password });
     },
     show() {
         const url = '/user/show';
@@ -36,8 +29,8 @@ const userApi = {
         const url = `/user/show/${email}`;
         return axiosClient.get(url);
     },
-    update(data, id) {
-        const url = `/user/update/${id}`;
+    update(data, email) {
+        const url = `/user/update/${email}`;
         return axiosClient.put(url, data);
     },
     delete(email) {
@@ -45,9 +38,9 @@ const userApi = {
         return axiosClient.delete(url);
     },
     search(q) {
-        const params = { q };
-        const url = '/user/search';
-        return axiosClient.get(url, { params });
+        const params = q.target.value;
+        const url = `/user/search?q=${params}`;
+        return axiosClient.get(url);
     },
 };
 

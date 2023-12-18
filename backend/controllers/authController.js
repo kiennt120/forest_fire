@@ -133,22 +133,23 @@ class AuthController {
         } catch (err) {
             return res.status(401).json({
                 status: false,
+                code: 401,
                 message: err.message,
             });
         }
         // 3. If user is exits
         let user;
-        if (decoded.role !== 'admin') {
-            user = await Supervisor.findOne({
-                where: {
-                    email: decoded.email,
-                },
-            });
-        } else {
-            user = await Admin.findOne({
-                where: {
-                    email: decoded.email,
-                },
+
+        user = await Credential.findOne({
+            where: {
+                email: decoded.email,
+            },
+        });
+
+        if (!user) {
+            return res.status(401).json({
+                status: false,
+                message: 'The user belonging to this token does no longer exist.',
             });
         }
 
@@ -164,6 +165,7 @@ class AuthController {
         return (req, res, next) => {
             if (req.user.role !== role) {
                 return res.status(403).json({
+                    code: 403,
                     message: 'You do not have permission to perform this action',
                 });
             }

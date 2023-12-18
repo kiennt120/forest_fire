@@ -79,6 +79,7 @@ const RouterURL = () => {
                                 <PublicRoute redirect={route.redirect}>
                                     <Layout style={{ minHeight: '100vh' }}>
                                         {/* {localStorage.getItem('token') !== null ? <Header /> : null} */}
+                                        <Header />
                                         <Content style={{ marginTop: 50 }}>
                                             <Suspense fallback={<LoadingScreen />}>
                                                 <Page />
