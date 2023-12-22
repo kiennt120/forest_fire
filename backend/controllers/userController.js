@@ -41,7 +41,7 @@ class UserController {
                         email: req.body.email,
                     },
                 });
-                return res.status(400).send(err);
+                return res.status(400).json({ status: false, message: err });
             }
         } else if (req.body.role === 'user') {
             const { error } = registerValidator({ email: req.body.email, password: req.body.password });
@@ -112,7 +112,7 @@ class UserController {
                 });
             }
         }
-        return res.json({ status: true, user });
+        return res.status(200).json({ status: true, user });
     }
 
     // [GET] /user/edit/:id
@@ -123,14 +123,26 @@ class UserController {
     // [PUT] /user/update/:email
     async update(req, res, next) {
         try {
-            await Supervisor.update(req.body, {
+            if (req.body.email !== req.params.email) {
+                await Credential.update(
+                    {
+                        email: req.body.email,
+                    },
+                    {
+                        where: {
+                            email: req.params.email,
+                        },
+                    },
+                );
+            }
+            const user = await Supervisor.update(req.body, {
                 where: {
-                    email: req.params.email,
+                    email: req.body.email,
                 },
             });
-            return res.json({ status: true, message: 'Update successfully' });
+            return res.status(200).json({ status: true, message: 'Update successfully' });
         } catch (err) {
-            return res.json({ status: false, message: err });
+            return res.status(401).json({ status: false, message: 'Cannot update this account' });
         }
     }
 
@@ -143,9 +155,9 @@ class UserController {
                     email: req.params.email,
                 },
             });
-            return res.json({ status: true, message: 'Delete successfully' });
+            return res.status(200).json({ status: true, message: 'Delete successfully' });
         } catch (err) {
-            return res.json({ status: false, message: err });
+            return res.status(401).json({ status: false, message: 'Cannot delete this account' });
         }
     }
 
@@ -161,7 +173,7 @@ class UserController {
                 ],
             },
         });
-        return res.json({ status: true, user });
+        return res.status(200).json({ status: true, user });
     }
 }
 

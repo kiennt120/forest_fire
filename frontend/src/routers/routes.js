@@ -15,8 +15,8 @@ const AdminRoute = ({ children }) => {
     return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
-const UserRouteUser = ({ children }) => {
-    const isAuthenticated = localStorage.getItem('token') !== null && localStorage.getItem('role') === 'user';
+const UserRoute = ({ children }) => {
+    const isAuthenticated = localStorage.getItem('token') !== null;
     return isAuthenticated ? children : <Navigate to="/login" />;
 };
 
@@ -24,6 +24,12 @@ const PublicRoute = ({ children, redirect }) => {
     const isAuthenticated = localStorage.getItem('token') === null || redirect === false;
     return isAuthenticated ? children : <Navigate to="/fire-list" />;
 };
+
+const Test = lazy(() => {
+    return Promise.all([import('~/pages/Common/Test/test'), new Promise((resolve) => setTimeout(resolve, 0))]).then(
+        ([moduleExports]) => moduleExports,
+    );
+});
 
 const Login = lazy(() => {
     return Promise.all([import('~/pages/Common/Login/login'), new Promise((resolve) => setTimeout(resolve, 0))]).then(
@@ -45,6 +51,19 @@ const MonitoringStation = lazy(() => {
     ]).then(([moduleExports]) => moduleExports);
 });
 
+const Monitor = lazy(() => {
+    return Promise.all([
+        import('~/pages/Supervisor/monitor/monitor'),
+        new Promise((resolve) => setTimeout(resolve, 0)),
+    ]).then(([moduleExports]) => moduleExports);
+});
+
+const Camera = lazy(() => {
+    return Promise.all([import('~/pages/Admin/Camera/camera'), new Promise((resolve) => setTimeout(resolve, 0))]).then(
+        ([moduleExports]) => moduleExports,
+    );
+});
+
 const User = lazy(() => {
     return Promise.all([import('~/pages/Admin/User/user'), new Promise((resolve) => setTimeout(resolve, 0))]).then(
         ([moduleExports]) => moduleExports,
@@ -55,15 +74,23 @@ const publicRoutes = [
     { path: '/', element: FireList, redirect: false },
     { path: '/login', element: Login, redirect: true },
     { path: '/fire-list', element: FireList, redirect: false },
+    { path: '/test', element: Test, redirect: false },
 ];
 const adminRoutes = [
-    { path: '/monitoring-station', element: MonitoringStation },
+    {
+        path: '/monitoring-station',
+        element: MonitoringStation,
+    },
     {
         path: '/user',
         element: User,
     },
+    {
+        path: '/camera',
+        element: Camera,
+    },
 ];
-const userRoutes = [];
+const userRoutes = [{ path: '/monitor', element: Monitor }];
 
 const RouterURL = () => {
     return (
@@ -134,13 +161,13 @@ const RouterURL = () => {
                             key={index}
                             path={route.path}
                             element={
-                                <UserRouteUser>
+                                <UserRoute>
                                     <Layout style={{ minHeight: '100vh' }}>
                                         <Sidebar />
                                         <Layout>
                                             <Header />
                                             <Content
-                                                style={{ marginLeft: 225, width: 'calc(100% - 230px)', marginTop: 50 }}
+                                                style={{ marginLeft: 222, width: 'calc(100% - 230px)', marginTop: 50 }}
                                             >
                                                 <Suspense fallback={<LoadingScreen />}>
                                                     <Page />
@@ -149,7 +176,7 @@ const RouterURL = () => {
                                             <Footer />
                                         </Layout>
                                     </Layout>
-                                </UserRouteUser>
+                                </UserRoute>
                             }
                         />
                     );

@@ -7,5 +7,6 @@ router.patch('/update-password', authController.protect, authController.updatePa
 router.post('/forgot-password', authController.forgotPassword);
 router.post('/reset-password', authController.resetPassword);
 router.post('/logout', authController.logout);
+router.get('/check-token', authController.checkToken);
 
 module.exports = router;

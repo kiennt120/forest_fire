@@ -115,7 +115,7 @@ const User = () => {
                 if (res.status) {
                     notification['success']({
                         message: 'Thông báo',
-                        description: res.description,
+                        description: res.message,
                     });
                     form2.resetFields();
                     setOpenModalUpdate(false);
@@ -123,7 +123,7 @@ const User = () => {
                 } else {
                     notification['error']({
                         message: 'Thông báo',
-                        description: res.description,
+                        description: res.message,
                     });
                 }
             });
@@ -136,15 +136,12 @@ const User = () => {
     const handleUpdatePassword = async (values) => {
         setLoading(true);
         try {
-            const user = {
-                email: values.email,
-                password: values.password,
-            };
-            await userApi.updatePassword(user.email, user.password).then((res) => {
+            console.log(values.password);
+            await userApi.updatePassword(email, values.password).then((res) => {
                 if (res.status) {
                     notification['success']({
                         message: 'Thông báo',
-                        description: res.description,
+                        description: res.message,
                     });
                     form3.resetFields();
                     setOpenModalUpdatePassword(false);
@@ -152,7 +149,7 @@ const User = () => {
                 } else {
                     notification['error']({
                         message: 'Thông báo',
-                        description: res.description,
+                        description: res.message,
                     });
                 }
             });
@@ -217,7 +214,7 @@ const User = () => {
                 } else {
                     notification['error']({
                         message: 'Thông báo',
-                        description: res.description,
+                        description: res.message,
                     });
                 }
             });
@@ -236,7 +233,7 @@ const User = () => {
                 } else {
                     notification['error']({
                         message: 'Thông báo',
-                        description: res.description,
+                        description: res.message,
                     });
                 }
             });
@@ -251,43 +248,43 @@ const User = () => {
             title: 'ID',
             render: (text, record, index) => index + 1 + pageSize * (page - 1),
             key: 'id',
-            width: 150,
+            width: 20,
             fixed: 'left',
         },
         {
             title: 'Tên trạm giám sát',
             dataIndex: 'mSName',
             key: 'mSName',
-            width: 150,
+            width: 80,
         },
         {
             title: 'Tên GSV',
             dataIndex: 'name',
             key: 'name',
-            width: 150,
+            width: 80,
         },
         {
             title: 'Ngày sinh',
             dataIndex: 'birthday',
             key: 'birthday',
-            width: 150,
+            width: 60,
         },
         {
             title: 'Số điện thoại',
             dataIndex: 'phone',
             key: 'phone',
-            width: 150,
+            width: 50,
         },
         {
             title: 'Email',
             dataIndex: 'email',
             key: 'email',
-            width: 150,
+            width: 90,
         },
         {
             title: 'Thao tác',
             key: 'action',
-            width: 150,
+            width: 120,
             fixed: 'right',
             render: (record) => (
                 <div>
@@ -296,14 +293,17 @@ const User = () => {
                             size="small"
                             icon={<EditOutlined />}
                             style={{ borderRadius: 15, height: 30 }}
-                            onClick={() => handleUpdatePassword(record.email)}
+                            onClick={() => {
+                                setEmail(record.email);
+                                setOpenModalUpdatePassword(true);
+                            }}
                         >
                             {'Update password'}
                         </Button>
                         <Button
                             size="small"
                             icon={<EditOutlined />}
-                            style={{ borderRadius: 15, height: 30 }}
+                            style={{ borderRadius: 15, height: 30, marginLeft: 10 }}
                             onClick={() => handleEditUser(record.email)}
                         >
                             {'Chỉnh sửa'}
@@ -553,48 +553,57 @@ const User = () => {
                         form3
                             .validateFields()
                             .then((values) => {
-                                // form2.resetFields();
                                 handleUpdatePassword(values);
                             })
                             .catch((error) => {
                                 console.log(error);
                             });
                     }}
-                    onCancel={() => handleCancel('update')}
+                    onCancel={() => handleCancel('updatePassword')}
                     okText="Hoàn thành"
                     cancelText="Hủy"
-                    width={500}
+                    width={300}
                 >
-                    <Form>
+                    <Form form={form3} name="eventCreate" layout="vertical" scrollToFirstError>
                         <Form.Item
                             name="password"
-                            label="Mật khẩu"
+                            label="Password"
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Vui lòng nhập mật khẩu',
+                                    message: 'Please input your password!',
                                 },
                                 { max: 20, message: 'Mật khẩu tối đa 20 ký tự' },
                                 { min: 6, message: 'Mật khẩu ít nhất 5 ký tự' },
                             ]}
-                            style={{ marginBottom: 10 }}
+                            hasFeedback
                         >
-                            <Input placeholder="Nhập mật khẩu" />
+                            <Input.Password />
                         </Form.Item>
+
                         <Form.Item
-                            name="confirm_password"
-                            label="Xác nhận lại mật khẩu"
+                            name="confirm"
+                            label="Confirm Password"
+                            dependencies={['password']}
+                            hasFeedback
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Vui lòng nhập mật khẩu',
+                                    message: 'Please confirm your password!',
                                 },
-                                { max: 20, message: 'Mật khẩu tối đa 20 ký tự' },
-                                { min: 6, message: 'Mật khẩu ít nhất 5 ký tự' },
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        if (!value || getFieldValue('password') === value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(
+                                            new Error('The new password that you entered do not match!'),
+                                        );
+                                    },
+                                }),
                             ]}
-                            style={{ marginBottom: 10 }}
                         >
-                            <Input placeholder="Nhập lại mật khẩu" />
+                            <Input.Password />
                         </Form.Item>
                     </Form>
                 </Modal>

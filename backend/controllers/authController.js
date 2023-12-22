@@ -62,7 +62,7 @@ class AuthController {
         // Check validation of email and password
         const { error } = registerValidator({
             email: req.body.email,
-            password: req.body.new_password,
+            password: req.body.password,
         });
         if (error) return res.status(422).send(error.details[0].message);
         const account = await Credential.findOne({
@@ -79,15 +79,15 @@ class AuthController {
             });
         }
 
-        const checkPassword = await bcrypt.compare(req.body.new_password, account.password); // compare password
-        if (checkPassword) {
-            return res.status(422).json({
-                status: false,
-                message: 'Password is not changed',
-            });
-        }
+        // const checkPassword = await bcrypt.compare(req.body.new_password, account.password); // compare password
+        // if (checkPassword) {
+        //     return res.status(422).json({
+        //         status: false,
+        //         message: 'Password is not changed',
+        //     });
+        // }
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(req.body.new_password, salt);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
         const obj = {
             password: hashedPassword,
         };
@@ -98,16 +98,60 @@ class AuthController {
                     email: req.body.email,
                 },
             });
-            console.log(user);
-            const token = signToken(user.email, user.role);
-            res.status(201).json({
+            if (user.role !== 'admin') {
+                const token = signToken(user.email, user.role);
+                res.status(201).json({
+                    status: true,
+                    token,
+                    user: user,
+                    role: user.role,
+                    message: 'Update password successfully',
+                });
+            } else {
+                res.status(201).json({
+                    status: true,
+                    message: 'Update password successfully',
+                });
+            }
+        } catch (err) {
+            return res.status(400).json({
+                status: false,
+                message: 'Failed to update password',
+            });
+        }
+    }
+
+    // [GET] /auth/check-auth
+    async checkToken(req, res, next) {
+        // 1. Read a token & check if it's exist
+        let token = req.headers.authorization;
+        // console.log(token);
+        // let token;
+        if (token && token.startsWith('Bearer ')) {
+            token = token.split(' ')[1];
+        }
+        if (!token) {
+            return res.status(401).json({
+                code: 401,
+                status: false,
+                message: 'You are not logged in! Please log in to get access.',
+            });
+        }
+
+        // 2. Verification token
+        let decoded;
+        try {
+            decoded = jwt.verify(token, process.env.JWT_SECRET);
+            return res.status(200).json({
                 status: true,
-                token,
-                user: user,
-                role: user.role,
+                message: 'Token is valid',
             });
         } catch (err) {
-            return res.status(400).send(err);
+            return res.status(401).json({
+                code: 401,
+                status: false,
+                message: err.message,
+            });
         }
     }
 
@@ -122,6 +166,7 @@ class AuthController {
         if (!token) {
             return res.status(401).json({
                 status: false,
+                code: 401,
                 message: 'You are not logged in! Please log in to get access.',
             });
         }
@@ -149,6 +194,7 @@ class AuthController {
         if (!user) {
             return res.status(401).json({
                 status: false,
+                code: 401,
                 message: 'The user belonging to this token does no longer exist.',
             });
         }
@@ -164,8 +210,8 @@ class AuthController {
     restrict(role) {
         return (req, res, next) => {
             if (req.user.role !== role) {
-                return res.status(403).json({
-                    code: 403,
+                return res.status(401).json({
+                    code: 401,
                     message: 'You do not have permission to perform this action',
                 });
             }

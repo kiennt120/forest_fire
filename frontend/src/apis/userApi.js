@@ -1,6 +1,10 @@
 import axiosClient from './axiosClient';
 
 const userApi = {
+    checkToken() {
+        const url = '/auth/check-token';
+        return axiosClient.get(url);
+    },
     register(data) {
         const url = '/user/create';
         return axiosClient.post(url, data);

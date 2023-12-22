@@ -25,7 +25,7 @@ import { PageHeader } from '@ant-design/pro-layout';
 const { Option } = Select;
 
 const MonitoringStation = () => {
-    const pageSize = 10;
+    const pageSize = 15;
     const [page, setPage] = useState(1);
     const [mSList, setMSList] = useState([]);
     const [openModalCreate, setOpenModalCreate] = useState(false);
@@ -67,7 +67,7 @@ const MonitoringStation = () => {
             };
             await mSApi.createMonitoringStation(newMS).then((res) => {
                 if (res.status) {
-                    // form.resetFields();
+                    form.resetFields();
                     notification['success']({
                         message: 'Thông báo',
                         description: res.description,
@@ -219,28 +219,28 @@ const MonitoringStation = () => {
             key: 'name',
             render: (text) => text,
             fixed: 'left',
-            width: 130,
+            width: 150,
         },
         {
             title: 'Tỉnh/Thành phố',
             dataIndex: 'city',
             key: 'city',
             render: (text) => text,
-            width: 150,
+            width: 190,
         },
         {
-            title: 'Quận/Huyện',
+            title: 'Quận/Huyện/Thị xã',
             dataIndex: 'district',
             key: 'district',
             render: (text) => text,
-            width: 150,
+            width: 190,
         },
         {
             title: 'Phường/Xã/Thị trấn',
             dataIndex: 'ward',
             key: 'ward',
             render: (text) => text,
-            width: 180,
+            width: 190,
         },
         {
             title: 'Khu vực',
@@ -254,12 +254,14 @@ const MonitoringStation = () => {
             dataIndex: 'leader',
             key: 'leader',
             render: (text) => text,
+            width: 180,
         },
         {
             title: 'Số điện thoại',
             dataIndex: 'phone',
             key: 'phone',
             render: (text) => text,
+            width: 120,
         },
         {
             title: 'Action',
@@ -302,18 +304,19 @@ const MonitoringStation = () => {
     useEffect(() => {
         (async () => {
             try {
-                await mSApi.getMonitoringStation().then((res) => {
-                    if (res.status) {
-                        console.log(res);
-                        setMSList(res.ms);
-                        setLoading(false);
-                    } else {
-                        if (res.code === 401 || res.code === 403) {
-                            localStorage.clear();
-                            navigate('/login');
-                        }
-                    }
-                });
+                // await mSApi.getMonitoringStation().then((res) => {
+                //     if (res.status) {
+                //         console.log(res);
+                //         setMSList(res.ms);
+                //         setLoading(false);
+                //     } else {
+                //         if (res.code === 401 || res.code === 403) {
+                //             localStorage.clear();
+                //             navigate('/login');
+                //         }
+                //     }
+                // });
+                handleMSList();
                 var promise = axios(Parameter);
                 promise.then((res) => {
                     console.log(res.data);

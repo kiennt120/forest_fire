@@ -53,7 +53,7 @@ const Login = () => {
                         <img className="formImg" src={backgroundLogin} alt="spaceship" />
                     </div>
                     <Form
-                        style={{ width: 340, marginBottom: 8 }}
+                        style={{ width: 340, marginBottom: 8, marginLeft: 60 }}
                         name="normal_login"
                         className="loginform"
                         initialValues={{

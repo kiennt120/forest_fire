@@ -1,14 +1,3 @@
-CREATE TABLE `fire`(
-    `fireId` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `cameraId` INT UNSIGNED NOT NULL,
-    `type_fire` VARCHAR(255) NOT NULL,
-    `status` TINYINT(1) NOT NULL,
-    `image` VARCHAR(255) NOT NULL,
-    `address` VARCHAR(255) NOT NULL,
-    `createdAt` DATETIME NOT NULL,
-    `updatedAt` DATETIME NOT NULL
-);
-
 CREATE TABLE `credential`(
 --     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(255) NOT NULL PRIMARY KEY UNIQUE,
@@ -28,9 +17,20 @@ CREATE TABLE `admin`(
     `updatedAt` DATETIME NOT NULL
 );
 
+CREATE TABLE `fire`(
+    `fireId` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `cameraId` INT UNSIGNED NULL,
+    `type_fire` VARCHAR(255) NOT NULL,
+    `status` TINYINT(1) NOT NULL,
+    `image` VARCHAR(255) NOT NULL,
+    `address` VARCHAR(255) NOT NULL,
+    `createdAt` DATETIME NOT NULL,
+    `updatedAt` DATETIME NOT NULL
+);
+
 CREATE TABLE `email_sended`(
     `eSId` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    `cameraId` INT UNSIGNED NOT NULL,
+    `cameraId` INT UNSIGNED NULL,
     `createdAt` DATETIME NOT NULL
 );
 
@@ -72,12 +72,12 @@ CREATE TABLE `monitoring_station`(
 ALTER TABLE
     `supervisor` ADD CONSTRAINT `supervisor_mSName_foreign` FOREIGN KEY(`mSName`) REFERENCES `monitoring_station`(`name`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE
-    `email_sended` ADD CONSTRAINT `email_sended_cameraid_foreign` FOREIGN KEY(`cameraId`) REFERENCES `camera`(`cameraId`) ON UPDATE CASCADE;
+    `email_sended` ADD CONSTRAINT `email_sended_cameraid_foreign` FOREIGN KEY(`cameraId`) REFERENCES `camera`(`cameraId`) ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE
-    `fire` ADD CONSTRAINT `fire_cameraid_foreign` FOREIGN KEY(`cameraId`) REFERENCES `camera`(`cameraId`) ON UPDATE CASCADE;
+    `fire` ADD CONSTRAINT `fire_cameraid_foreign` FOREIGN KEY(`cameraId`) REFERENCES `camera`(`cameraId`) ON DELETE SET NULL ON UPDATE CASCADE;
 ALTER TABLE
     `camera` ADD CONSTRAINT `camera_mSName_foreign` FOREIGN KEY(`mSName`) REFERENCES `monitoring_station`(`name`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE
-    `admin` ADD CONSTRAINT `admin_email_foreign` FOREIGN KEY(`email`) REFERENCES `credential`(`email`) ON DELETE CASCADE;
+    `admin` ADD CONSTRAINT `admin_email_foreign` FOREIGN KEY(`email`) REFERENCES `credential`(`email`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE
-    `supervisor` ADD CONSTRAINT `supervisor_email_foreign` FOREIGN KEY(`email`) REFERENCES `credential`(`email`) ON DELETE CASCADE;
+    `supervisor` ADD CONSTRAINT `supervisor_email_foreign` FOREIGN KEY(`email`) REFERENCES `credential`(`email`) ON DELETE CASCADE ON UPDATE CASCADE;

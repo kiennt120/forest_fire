@@ -8,7 +8,7 @@ const express = require('express');
 const cors = require('cors');
 
 function route(app) {
-    app.use(express.json());
+    // app.use(express.json());
     app.use(cors());
     app.use('/api/user', authController.protect, authController.restrict('admin'), userRouter);
     app.use('/api/auth', authRouter);

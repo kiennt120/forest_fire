@@ -39,9 +39,9 @@ function Sidebar() {
             icon: <VideoCameraAddOutlined />,
         },
         {
-            key: 'video',
+            key: 'monitor',
             title: 'Giám sát camera',
-            link: '/video',
+            link: '/monitor',
             icon: <VideoCameraOutlined />,
         },
         {
@@ -66,9 +66,9 @@ function Sidebar() {
             icon: <FireOutlined />,
         },
         {
-            key: 'video',
+            key: 'monitor',
             title: 'Giám sát camera',
-            link: '/video',
+            link: '/monitor',
             icon: <VideoCameraOutlined />,
         },
     ];

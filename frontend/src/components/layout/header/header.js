@@ -7,12 +7,13 @@ import userApi from '~/apis/userApi';
 import en from '~/assets/image/en.png';
 import vn from '~/assets/image/vn.png';
 import logo from '~/assets/image/a.png';
-import avatar from '~/assets/image/FB_IMG_1613925132995.jpg';
-import { Link } from 'react-router-dom';
+import avatar from '~/assets/image/logo_apaga_o_fogo.png';
+import { Link, useNavigate } from 'react-router-dom';
 
 const { Header } = Layout;
 
 function Topbar() {
+    const navigate = useNavigate();
     const [countNotification, setCountNotification] = useState(0);
     const [notification, setNotification] = useState([]);
     const [visible, setVisible] = useState(false);
@@ -95,28 +96,31 @@ function Topbar() {
             </Menu.Item>
         </Menu>
     );
-    const TransalteSwitch = () => {
-        return (
-            <Dropdown key="more" menu={menu} placement="bottomCenter" arrow>
-                <div
-                    style={{
-                        paddingLeft: 10,
-                        paddingRight: 10,
-                        cursor: 'pointer',
-                    }}
-                    className="container"
-                >
-                    <TranslationOutlined />
-                </div>
-            </Dropdown>
-        );
-    };
+    // const TransalteSwitch = () => {
+    //     return (
+    //         <Dropdown key="more" menu={menu} placement="bottomCenter" arrow>
+    //             <div
+    //                 style={{
+    //                     paddingLeft: 10,
+    //                     paddingRight: 10,
+    //                     cursor: 'pointer',
+    //                 }}
+    //                 className="container"
+    //             >
+    //                 <TranslationOutlined />
+    //             </div>
+    //         </Dropdown>
+    //     );
+    // };
 
     useEffect(() => {
         (async () => {
             try {
-                // const res = await userApi.pingRole();
-                // console.log(res.role);
+                const res = await userApi.checkToken();
+                if (!res.status) {
+                    localStorage.clear();
+                    navigate('/login');
+                }
             } catch (error) {
                 console.log('Failed to fetch event list:' + error);
             }
@@ -207,7 +211,7 @@ function Topbar() {
                         </div>
                     </Col>
                 </Row>
-                <Modal
+                {/* <Modal
                     title={titleNotification}
                     open={visible}
                     onOk={handleOk}
@@ -215,7 +219,7 @@ function Topbar() {
                     cancelButtonProps={{ style: { display: 'none' } }}
                 >
                     <p dangerouslySetInnerHTML={{ __html: contentNotification }}></p>
-                </Modal>
+                </Modal> */}
             </div>
         </div>
     );

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './fireList.css';
 import { Table, Button, Modal, Form, Input, Select, message, Spin, notification, Row, Col, DatePicker } from 'antd';
-import { SaveOutlined, SearchOutlined } from '@ant-design/icons';
+import { SaveOutlined, SearchOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router';
 import fireListApi from '~/apis/fireListApi';
 import { PageHeader } from '@ant-design/pro-layout';
 import dayjs from 'dayjs';
@@ -17,6 +18,7 @@ dayjs.extend(customParseFormat);
 const dateFormat = 'YYYY-MM-DD';
 
 const FireList = () => {
+    const navigate = useNavigate();
     const [fireList, setFireList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [from, setFrom] = useState('');
@@ -118,9 +120,9 @@ const FireList = () => {
         },
         {
             title: 'Thời gian thu nhận',
-            dataIndex: 'updated_at',
-            key: 'updated_at',
-            render: (text) => text,
+            dataIndex: 'updatedAt',
+            key: 'updatedAt',
+            render: (text) => dayjs(text).format('DD/MM/YYYY HH:mm:ss'),
             width: 180,
         },
         {
@@ -265,6 +267,18 @@ const FireList = () => {
                                             icon={<SaveOutlined />}
                                         >
                                             Xuất file
+                                        </Button>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        <Button
+                                            icon={<VideoCameraOutlined />}
+                                            onClick={() => navigate('/monitor')}
+                                            style={{ marginBottom: 20, marginLeft: 50, borderRadius: 15 }}
+                                            type="primary"
+                                        >
+                                            Giám sát camera
                                         </Button>
                                     </Col>
                                 </Row>

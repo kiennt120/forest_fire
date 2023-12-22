@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './dropdownMenu.css';
 import { useNavigate, Link } from 'react-router-dom';
 import { Avatar, Dropdown, Row, Menu } from 'antd';
-import { UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
+import { UserOutlined, SettingOutlined, LogoutOutlined, CameraOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import userApi from '~/apis/userApi';
 import avatar from '~/assets/image/FB_IMG_1613925132995.jpg';
 
@@ -25,17 +25,22 @@ function DropDownMenu() {
 
     const menu = (
         <Menu>
-            <Menu.Item key="1" icon={<UserOutlined />}>
+            {/* <Menu.Item key="1" icon={<VideoCameraOutlined />}>
+                <a target="_blank" rel="noopener noreferrer" onClick={() => handleRouter('/monitor')}>
+                    Giám sát camera
+                </a>
+            </Menu.Item> */}
+            <Menu.Item key="2" icon={<UserOutlined />}>
                 <a target="_blank" rel="noopener noreferrer" onClick={() => handleRouter('/profile')}>
                     Thông tin cá nhân
                 </a>
             </Menu.Item>
-            <Menu.Item key="2" icon={<SettingOutlined />} onClick={() => handleRouter('/update-password')}>
+            <Menu.Item key="3" icon={<SettingOutlined />} onClick={() => handleRouter('/update-password')}>
                 <a target="_blank" rel="noopener noreferrer">
                     Thay đổi mật khẩu
                 </a>
             </Menu.Item>
-            <Menu.Item key="3" icon={<LogoutOutlined />} onClick={Logout}>
+            <Menu.Item key="4" icon={<LogoutOutlined />} onClick={Logout}>
                 <a target="_blank" rel="noopener noreferrer">
                     Logout
                 </a>
@@ -63,35 +68,10 @@ function DropDownMenu() {
                             src={avatar}
                         />
                     </div>
-                    <p style={{ padding: 0, margin: 0, textTransform: 'capitalize', color: '#000000' }}>
-                        {userData?.name}
-                    </p>
+                    <p style={{ padding: 0, margin: 0, color: '#000000' }}>{userData.email}</p>
                 </div>
             </Row>
         </Dropdown>
-        // ) : (
-        //     <Row
-        //         style={{
-        //             paddingLeft: 5,
-        //             paddingRight: 5,
-        //             cursor: 'pointer',
-        //         }}
-        //         className="container"
-        //     >
-        //         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        //             <div style={{ paddingRight: 10 }}>
-        //                 <Avatar
-        //                     style={{
-        //                         outline: 'none',
-        //                     }}
-        //                     src={avatar}
-        //                 />
-        //             </div>
-        //             {/* <p style={{ padding: 0, margin: 0, textTransform: 'capitalize', color: '#000000' }}> */}
-        //             <Link to="/login">Login</Link>
-        //             {/* </p> */}
-        //         </div>
-        //     </Row>
     );
 }
 
