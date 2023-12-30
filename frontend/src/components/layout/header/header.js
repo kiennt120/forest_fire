@@ -119,7 +119,7 @@ function Topbar() {
                 const res = await userApi.checkToken();
                 if (!res.status) {
                     localStorage.clear();
-                    navigate('/login');
+                    navigate('/fire-list');
                 }
             } catch (error) {
                 console.log('Failed to fetch event list:' + error);

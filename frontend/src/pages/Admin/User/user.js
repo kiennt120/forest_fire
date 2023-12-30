@@ -48,6 +48,7 @@ const User = () => {
     const [form] = Form.useForm();
     const [form2] = Form.useForm();
     const [form3] = Form.useForm();
+    const [mSList, setMSList] = useState([]);
 
     const showModal = () => {
         setOpenModalCreate(true);
@@ -255,19 +256,25 @@ const User = () => {
             title: 'Tên trạm giám sát',
             dataIndex: 'mSName',
             key: 'mSName',
-            width: 80,
+            width: 60,
+            sorter: { compare: (a, b) => a.mSName.localeCompare(b.mSName), multiple: 2 },
+            filters: mSList.map((item) => ({ text: item.name, value: item.name })),
+            onFilter: (value, record) => record.mSName.indexOf(value) === 0,
         },
         {
             title: 'Tên GSV',
             dataIndex: 'name',
             key: 'name',
-            width: 80,
+            width: 65,
+            sorter: { compare: (a, b) => a.name.localeCompare(b.name), multiple: 1 },
         },
         {
             title: 'Ngày sinh',
             dataIndex: 'birthday',
             key: 'birthday',
             width: 60,
+            render: (text) => dayjs(text).format('DD/MM/YYYY'),
+            sorter: (a, b) => dayjs(a.birthday).unix() - dayjs(b.birthday).unix(),
         },
         {
             title: 'Số điện thoại',
@@ -279,12 +286,12 @@ const User = () => {
             title: 'Email',
             dataIndex: 'email',
             key: 'email',
-            width: 90,
+            width: 70,
         },
         {
             title: 'Thao tác',
             key: 'action',
-            width: 120,
+            width: 110,
             fixed: 'right',
             render: (record) => (
                 <div>
@@ -325,8 +332,6 @@ const User = () => {
             ),
         },
     ];
-
-    const [mSList, setMSList] = useState([]);
 
     useEffect(() => {
         (async () => {
@@ -370,7 +375,7 @@ const User = () => {
                                     title: (
                                         <Link to="/user">
                                             <UserOutlined />
-                                            <span>Quản lý giám sát viên</span>
+                                            <span style={{ marginLeft: 3 }}>Quản lý giám sát viên</span>
                                         </Link>
                                     ),
                                 },
@@ -395,7 +400,7 @@ const User = () => {
                                                 <Button
                                                     onClick={showModal}
                                                     icon={<PlusOutlined />}
-                                                    style={{ marginLeft: 10 }}
+                                                    style={{ marginLeft: 10, borderRadius: 15, height: 30 }}
                                                 >
                                                     Thêm giám sát viên
                                                 </Button>
@@ -567,11 +572,11 @@ const User = () => {
                     <Form form={form3} name="eventCreate" layout="vertical" scrollToFirstError>
                         <Form.Item
                             name="password"
-                            label="Password"
+                            label="New password"
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Please input your password!',
+                                    message: 'Please input new password!',
                                 },
                                 { max: 20, message: 'Mật khẩu tối đa 20 ký tự' },
                                 { min: 6, message: 'Mật khẩu ít nhất 5 ký tự' },
@@ -716,6 +721,7 @@ const User = () => {
                         </Form.Item>
                     </Form>
                 </Modal>
+                <FloatButton.BackTop style={{ textAlign: 'right' }} />
             </Spin>
         </div>
     );

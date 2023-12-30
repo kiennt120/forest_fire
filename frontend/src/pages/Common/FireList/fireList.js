@@ -1,9 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import './fireList.css';
-import { Table, Button, Modal, Form, Input, Select, message, Spin, notification, Row, Col, DatePicker } from 'antd';
+import {
+    Table,
+    Button,
+    Modal,
+    Form,
+    Input,
+    Select,
+    message,
+    Spin,
+    notification,
+    Row,
+    Col,
+    DatePicker,
+    FloatButton,
+    Tag,
+} from 'antd';
 import { SaveOutlined, SearchOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import fireListApi from '~/apis/fireListApi';
+import cameraApi from '~/apis/cameraApi';
+import { FilterValue } from 'antd/lib/table/interface';
 import { PageHeader } from '@ant-design/pro-layout';
 import dayjs from 'dayjs';
 import jsPDF from 'jspdf';
@@ -19,11 +36,14 @@ const dateFormat = 'YYYY-MM-DD';
 
 const FireList = () => {
     const navigate = useNavigate();
+    const [page, setPage] = useState(1);
+    const pageSize = 10;
     const [fireList, setFireList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [from, setFrom] = useState('');
     const [to, setTo] = useState('');
     const [q, setQ] = useState('');
+    const [cameraList, setCameraList] = useState([]);
 
     const handleFireList = async () => {
         try {
@@ -58,14 +78,12 @@ const FireList = () => {
             console.log(error);
         }
     };
-    const [page, setPage] = useState(1);
-    const pageSize = 10;
     const columns = [
         {
             title: 'ID',
             dataIndex: 'fireId',
             key: 'fireId',
-            fixed: 'left',
+            // fixed: 'left',
             render: (text, record, index) => index + 1 + pageSize * (page - 1),
             width: 50,
         },
@@ -75,6 +93,8 @@ const FireList = () => {
             key: 'cameraId',
             render: (text) => text,
             width: 100,
+            filters: cameraList.map((item) => ({ text: item.cameraId, value: item.cameraId })),
+            onFilter: (value, record) => record.cameraId === value,
         },
         {
             title: 'Trạng thái đám cháy',
@@ -87,29 +107,59 @@ const FireList = () => {
             title: 'Trạng thái duyệt',
             dataIndex: 'status',
             key: 'status',
-            render: (bool) => (bool ? 'Đã duyệt' : 'Chưa duyệt'),
+            // render: (bool) => (bool ? 'Đã duyệt' : 'Chưa duyệt'),
+            render: (tag) => (
+                <>
+                    <Tag color={tag === 1 ? 'green' : 'red'} key={tag}>
+                        {tag ? 'Đã duyệt' : 'Chưa duyệt'}
+                    </Tag>
+                </>
+            ),
             width: 140,
+            filters: [
+                {
+                    text: 'Đã duyệt',
+                    value: 1,
+                },
+                {
+                    text: 'Chưa duyệt',
+                    value: 0,
+                },
+            ],
+            onFilter: (value, record) => record.status === value,
         },
         {
-            title: 'Xã',
-            dataIndex: 'ward',
-            key: 'ward',
-            render: (text) => text,
-            width: 150,
-        },
-        {
-            title: 'Huyện',
-            dataIndex: 'district',
-            key: 'district',
-            render: (text) => text,
-            width: 150,
-        },
-        {
-            title: 'Tỉnh',
+            title: 'Tỉnh/thành phố',
             dataIndex: 'city',
             key: 'city',
             render: (text) => text,
-            width: 150,
+            // width: 150,
+            sorter: {
+                compare: (a, b) => a.city.localeCompare(b.city),
+                multiple: 3,
+            },
+        },
+        {
+            title: 'Quận/Huyện',
+            dataIndex: 'district',
+            key: 'district',
+            render: (text) => text,
+            // width: 150,
+            sorter: {
+                compare: (a, b) => a.district.localeCompare(b.district),
+                multiple: 2,
+            },
+        },
+        {
+            title: 'Xã/Phường',
+            dataIndex: 'ward',
+            key: 'ward',
+            render: (text) => text,
+            // width: 150,
+            sorter: {
+                compare: (a, b) => a.ward.localeCompare(b.ward),
+                multiple: 1,
+            },
         },
         {
             title: 'Địa chỉ chi tiết',
@@ -124,12 +174,13 @@ const FireList = () => {
             key: 'updatedAt',
             render: (text) => dayjs(text).format('DD/MM/YYYY HH:mm:ss'),
             width: 180,
+            sorter: (a, b) => dayjs(a.updatedAt).unix() - dayjs(b.updatedAt).unix(),
         },
         {
             title: 'Hình ảnh',
             dataIndex: 'image',
             key: 'image',
-            render: (image) => <img src={image} alt="image" height="100px" />,
+            render: (image) => (image !== null ? <img src={image} alt="image" height="100px" /> : null),
         },
     ];
 
@@ -203,11 +254,20 @@ const FireList = () => {
 
     useEffect(() => {
         (async () => {
-            try {
-                handleFireList();
-            } catch (error) {
-                console.log(error);
-            }
+            // try {
+            //     handleFireList();
+            // } catch (error) {
+            //     console.log(error);
+            // }
+            await cameraApi
+                .getCamera()
+                .then((res) => {
+                    setCameraList(res.cameras);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+            handleFireList();
         })();
     }, []);
 
@@ -274,7 +334,11 @@ const FireList = () => {
                                     <Col>
                                         <Button
                                             icon={<VideoCameraOutlined />}
-                                            onClick={() => navigate('/monitor')}
+                                            onClick={() => {
+                                                localStorage.getItem('token') !== null
+                                                    ? navigate('/monitor')
+                                                    : navigate('/login');
+                                            }}
                                             style={{ marginBottom: 20, marginLeft: 50, borderRadius: 15 }}
                                             type="primary"
                                         >
@@ -289,17 +353,18 @@ const FireList = () => {
                         <Table
                             columns={columns}
                             dataSource={fireList}
-                            scroll={{ x: 1500, y: 300 }}
                             pagination={{
                                 pageSize,
                                 position: ['bottomCenter'],
                                 onChange: (current) => setPage(current),
                             }}
                             style={{ marginLeft: 4, marginRight: 4 }}
+                            scroll={{ x: 'max-content', y: 600 }}
                             bordered
                         />
                     </div>
                 </div>
+                <FloatButton.BackTop style={{ textAlign: 'right' }} />
             </Spin>
         </div>
     );

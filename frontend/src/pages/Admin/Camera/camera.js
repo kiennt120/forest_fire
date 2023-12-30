@@ -229,14 +229,14 @@ const Camera = () => {
             key: 'id',
             render: (text, record, index) => index + 1 + pageSize * (page - 1),
             fixed: 'left',
-            width: 50,
+            width: 30,
         },
         {
             title: 'Camera ID',
             dataIndex: 'cameraId',
             key: 'cameraId',
             render: (text) => text,
-            fixed: 'left',
+            // fixed: 'left',
             width: 50,
         },
         {
@@ -244,20 +244,16 @@ const Camera = () => {
             dataIndex: 'mSName',
             key: 'mSName',
             render: (text) => text,
-            fixed: 'left',
-            width: 150,
+            // fixed: 'left',
+            width: 100,
+            sorter: (a, b) => a.mSName.localeCompare(b.mSName),
+            filters: mSList.map((item) => ({ text: item.name, value: item.name })),
+            onFilter: (value, record) => record.mSName.indexOf(value) === 0,
         },
         {
             title: 'Tọa độ',
             dataIndex: 'coordinate',
             key: 'coordinate',
-            render: (text) => text,
-            width: 150,
-        },
-        {
-            title: 'Thông tin',
-            dataIndex: 'infor',
-            key: 'infor',
             render: (text) => text,
             width: 150,
         },
@@ -273,11 +269,22 @@ const Camera = () => {
                 </>
             ),
             width: 70,
+            filters: [
+                {
+                    text: 'Kết nối',
+                    value: 'connect',
+                },
+                {
+                    text: 'Ngắt kết nối',
+                    value: 'disconnect',
+                },
+            ],
+            onFilter: (value, record) => record.status.indexOf(value) === 0,
         },
         {
-            title: 'Địa chỉ IP',
-            dataIndex: 'ip',
-            key: 'ip',
+            title: 'Thông tin',
+            dataIndex: 'infor',
+            key: 'infor',
             render: (text) => text,
             width: 150,
         },
@@ -285,7 +292,7 @@ const Camera = () => {
             title: 'Thao tác',
             key: 'action',
             fixed: 'right',
-            width: 220,
+            width: 160,
             render: (text, record) => (
                 <div>
                     <Row>
@@ -342,6 +349,16 @@ const Camera = () => {
         },
     ];
 
+    const handleCameraStream = async () => {
+        fetch('http://localhost:6064/keep-alive', {
+            method: 'GET',
+            redirect: 'follow',
+        })
+            .then((response) => response.text())
+            .then((result) => console.log(result))
+            .catch((error) => console.log('error', error));
+    };
+
     useEffect(() => {
         handleCameraList();
         handleMSList();
@@ -365,7 +382,7 @@ const Camera = () => {
                                     title: (
                                         <Link to="/monitor">
                                             <BarsOutlined />
-                                            <span>Quản lý camera</span>
+                                            <span style={{ marginLeft: 3 }}>Quản lý camera</span>
                                         </Link>
                                     ),
                                 },
@@ -384,18 +401,34 @@ const Camera = () => {
                                             style={{ width: 300, height: 30, borderRadius: 15 }}
                                         />
                                     </Col>
-                                    <Col span="6">
-                                        <Row justify="end">
-                                            <Space>
-                                                <Button
-                                                    onClick={showModal}
-                                                    icon={<PlusOutlined />}
-                                                    style={{ marginLeft: 10 }}
-                                                >
-                                                    Thêm camera
-                                                </Button>
-                                            </Space>
-                                        </Row>
+                                    <Col>
+                                        {/* <Button
+                                            onClick={() => {
+                                                handleCameraStream();
+                                            }}
+                                            style={{ marginLeft: 10, borderRadius: 15, height: 30 }}
+                                        >
+                                            Tải lại camera
+                                        </Button> */}
+                                        <Popconfirm
+                                            title="Refresh?"
+                                            onConfirm={() => handleCameraStream()}
+                                            okText="Yes"
+                                            cancelText="No"
+                                        >
+                                            <Button style={{ marginLeft: 10, borderRadius: 15, height: 30 }}>
+                                                Tải lại camera
+                                            </Button>
+                                        </Popconfirm>
+                                    </Col>
+                                    <Col>
+                                        <Button
+                                            onClick={showModal}
+                                            icon={<PlusOutlined />}
+                                            style={{ marginLeft: 10, borderRadius: 15, height: 30 }}
+                                        >
+                                            Thêm camera
+                                        </Button>
                                     </Col>
                                 </Row>
                             </PageHeader>
@@ -453,7 +486,7 @@ const Camera = () => {
                                     message: 'Vui lòng nhập tên trạm giám sát',
                                 },
                             ]}
-                            style={{ marginBottom: 10 }}
+                            style={{ marginBottom: 5 }}
                         >
                             {/* <Input placeholder="Nhập tên trạm giám sát" /> */}
                             <Select showSearch placeholder="Chọn trạm giám sát">
@@ -471,10 +504,11 @@ const Camera = () => {
                                     message: 'Vui lòng nhập tọa độ',
                                 },
                             ]}
+                            style={{ marginBottom: 5 }}
                         >
                             <Input placeholder="Nhập tọa độ" />
                         </Form.Item>
-                        <Form.Item name="infor" label="Nhập thông tin camera">
+                        <Form.Item name="infor" label="Nhập thông tin camera" style={{ marginBottom: 5 }}>
                             <Input.TextArea placeholder="Nhập thông tin camera" />
                         </Form.Item>
                         <Form.Item
@@ -486,6 +520,7 @@ const Camera = () => {
                                     message: 'Vui lòng chọn trạng thái',
                                 },
                             ]}
+                            style={{ marginBottom: 5 }}
                         >
                             <Select placeholder="Chọn trạng thái">
                                 <Option value="disconnect" />
@@ -494,15 +529,20 @@ const Camera = () => {
                         </Form.Item>
                         <Form.Item
                             name="ip"
-                            label="Địa chỉ IP"
+                            label="URL của camera"
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Vui lòng nhập địa chỉ IP',
+                                    message: 'Vui lòng nhập URL của camera',
+                                },
+                                {
+                                    type: 'url',
+                                    message: 'Vui lòng nhập đúng định dạng URL',
                                 },
                             ]}
+                            style={{ marginBottom: 5 }}
                         >
-                            <Input placeholder="Nhập địa chỉ IP" />
+                            <Input placeholder="Nhập URL của camera" />
                         </Form.Item>
                     </Form>
                 </Modal>
@@ -543,7 +583,7 @@ const Camera = () => {
                                     message: 'Vui lòng nhập tên trạm giám sát',
                                 },
                             ]}
-                            style={{ marginBottom: 10 }}
+                            style={{ marginBottom: 5 }}
                         >
                             <Select showSearch placeholder="Chọn trạm giám sát">
                                 {mSList.map((item) => (
@@ -560,10 +600,11 @@ const Camera = () => {
                                     message: 'Vui lòng nhập tọa độ',
                                 },
                             ]}
+                            style={{ marginBottom: 5 }}
                         >
                             <Input placeholder="Nhập tọa độ" />
                         </Form.Item>
-                        <Form.Item name="infor" label="Nhập thông tin camera">
+                        <Form.Item name="infor" label="Nhập thông tin camera" style={{ marginBottom: 5 }}>
                             <Input.TextArea placeholder="Nhập thông tin camera" />
                         </Form.Item>
                         {/* <Form.Item
@@ -583,18 +624,24 @@ const Camera = () => {
                         </Form.Item> */}
                         <Form.Item
                             name="ip"
-                            label="Địa chỉ IP"
+                            label="URL của camera"
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Vui lòng nhập địa chỉ IP',
+                                    message: 'Vui lòng nhập URL của camera',
+                                },
+                                {
+                                    type: 'url',
+                                    message: 'Vui lòng nhập đúng định dạng URL',
                                 },
                             ]}
+                            style={{ marginBottom: 5 }}
                         >
-                            <Input placeholder="Nhập địa chỉ IP" />
+                            <Input placeholder="Nhập URL của camera" />
                         </Form.Item>
                     </Form>
                 </Modal>
+                <FloatButton.BackTop style={{ textAlign: 'right' }} />
             </Spin>
         </div>
     );

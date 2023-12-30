@@ -25,7 +25,7 @@ import { PageHeader } from '@ant-design/pro-layout';
 const { Option } = Select;
 
 const MonitoringStation = () => {
-    const pageSize = 15;
+    const pageSize = 10;
     const [page, setPage] = useState(1);
     const [mSList, setMSList] = useState([]);
     const [openModalCreate, setOpenModalCreate] = useState(false);
@@ -220,6 +220,7 @@ const MonitoringStation = () => {
             render: (text) => text,
             fixed: 'left',
             width: 150,
+            sorter: (a, b) => a.name.localeCompare(b.name),
         },
         {
             title: 'Tỉnh/Thành phố',
@@ -227,6 +228,9 @@ const MonitoringStation = () => {
             key: 'city',
             render: (text) => text,
             width: 190,
+            sorter: { compare: (a, b) => a.city.localeCompare(b.city), multiple: 3 },
+            filters: data.map((c) => ({ text: c.name, value: c.name })),
+            onFilter: (value, record) => record.city.indexOf(value) === 0,
         },
         {
             title: 'Quận/Huyện/Thị xã',
@@ -234,6 +238,7 @@ const MonitoringStation = () => {
             key: 'district',
             render: (text) => text,
             width: 190,
+            sorter: { compare: (a, b) => a.district.localeCompare(b.district), multiple: 2 },
         },
         {
             title: 'Phường/Xã/Thị trấn',
@@ -241,6 +246,7 @@ const MonitoringStation = () => {
             key: 'ward',
             render: (text) => text,
             width: 190,
+            sorter: { compare: (a, b) => a.ward.localeCompare(b.ward), multiple: 1 },
         },
         {
             title: 'Khu vực',
@@ -304,22 +310,9 @@ const MonitoringStation = () => {
     useEffect(() => {
         (async () => {
             try {
-                // await mSApi.getMonitoringStation().then((res) => {
-                //     if (res.status) {
-                //         console.log(res);
-                //         setMSList(res.ms);
-                //         setLoading(false);
-                //     } else {
-                //         if (res.code === 401 || res.code === 403) {
-                //             localStorage.clear();
-                //             navigate('/login');
-                //         }
-                //     }
-                // });
                 handleMSList();
                 var promise = axios(Parameter);
                 promise.then((res) => {
-                    console.log(res.data);
                     setData(JSON.parse(res.data));
                 });
             } catch (error) {
@@ -346,7 +339,7 @@ const MonitoringStation = () => {
                                     title: (
                                         <Link to="/monitoring-station">
                                             <BarsOutlined />
-                                            <span>Quản lý trạm giám sát</span>
+                                            <span style={{ marginLeft: 3 }}>Quản lý trạm giám sát</span>
                                         </Link>
                                     ),
                                 },
@@ -372,7 +365,7 @@ const MonitoringStation = () => {
                                                 <Button
                                                     onClick={showModal}
                                                     icon={<PlusOutlined />}
-                                                    style={{ marginLeft: 10 }}
+                                                    style={{ marginLeft: 10, borderRadius: 15, height: 30 }}
                                                 >
                                                     Thêm trạm giám sát
                                                 </Button>

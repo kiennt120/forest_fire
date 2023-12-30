@@ -23,6 +23,22 @@ const fireListApi = {
         const url = `/fire-list/searchByTime?from=${from}&to=${to}`;
         return axiosClient.get(url);
     },
+    fireTo() {
+        const url = '/fire-list/fireTo';
+        return axiosClient.get(url);
+    },
+    deleteFire(id) {
+        const url = `/fire-list/delete/${id}`;
+        return axiosClient.delete(url);
+    },
+    createFire(data) {
+        const url = '/fire-list/create';
+        return axiosClient.post(url, data);
+    },
+    updateFire(data, id) {
+        const url = `/fire-list/update/${id}`;
+        return axiosClient.put(url, data);
+    },
 };
 
 export default fireListApi;
